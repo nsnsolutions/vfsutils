@@ -26,7 +26,7 @@ $ sudo python setup.py install
 
 To install vfs utils using pip:
 ```bash
-$ sudo pip install git@github.com:nsnsolutions/vfsutils.git
+$ sudo pip install https://github.com/nsnsolutions/vfsutils.git
 ```
 
 #### WINDOWS
