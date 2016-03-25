@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 from argparse import ArgumentParser, REMAINDER
 from sys import argv
-from utils import Ini2Json
+from utils import Ini2Json, SrvCtrl
 
 
 ENTRY_POINTS = {
-    "ini2json": Ini2Json
+    "ini2json": Ini2Json,
+    "SrvCtrl": SrvCtrl
 }
 
 
