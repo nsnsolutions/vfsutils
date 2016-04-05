@@ -12,7 +12,7 @@ class SrvCtrl(object):
             description="Manage VFS Services."
         )
         self._ap.set_defaults(
-            url="https://api.vfs.velma.com/dev/system/service/"
+            url="https://api.vfs.velma.com/v1/system/service/"
         )
         sap = self._ap.add_subparsers(help="Select an action.");
 
