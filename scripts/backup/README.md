@@ -1,3 +1,10 @@
+## Deps
+Install the AWS sdk.
+
+```
+npm install aws-sdk
+```
+
 ## To backup
 Modify backup.js to set the TableName to be backed up.
 
