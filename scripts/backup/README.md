@@ -13,8 +13,15 @@ node ./backup.js > backup.json
 ```
 
 ## To Restore.
-Moodify restore.js to set the TableName to be restored.
+Modify restore.js to set the TableName to be restored.
 
 ```
 node ./restore.js
 ```
+
+## To backup all
+Modify backupAll.js and add tablenames to DB_MAP
+
+```
+node backupAll.js c:\VFS\DynamoDB\Backups
+
