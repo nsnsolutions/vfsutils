@@ -75,7 +75,10 @@ function dumpTable(ddb, tableName, keySchema, throttle) {
 
         var allTheKeys = [];
         async.eachOfSeries(data.Items, (item, index, done) => deleteItem(ddb, index, tableName, item, throttle, done), (err) => {
-            console.error("Something didnt go well!", err, err.stack);
+            if(err)
+                console.error("Something didnt go well!", err, err.stack);
+            else
+                console.log("\nDone.");
         });
     });
 }
@@ -83,6 +86,8 @@ function dumpTable(ddb, tableName, keySchema, throttle) {
 function deleteItem(ddb, index, tableName, key, throttle, done) {
     ddb.deleteItem({TableName: tableName, Key: key, ReturnValues: "ALL_OLD"}, function(err, data) {
         if(err) done(err);
+
+        setTimeout(done, throttle);
 
         switch(index % 4) {
             case 0:
@@ -98,8 +103,6 @@ function deleteItem(ddb, index, tableName, key, throttle, done) {
                 process.stdout.write('\b.|');
                 break;
         }
-
-        setTimeout(done, throttle);
 
     });
 }
