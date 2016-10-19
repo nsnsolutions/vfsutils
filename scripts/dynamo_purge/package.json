@@ -1,0 +1,19 @@
+{
+  "name": "dynamo_purge",
+  "version": "1.0.0",
+  "description": "Remove all records from a dynamo table.",
+  "bin": {
+    "dynamoPurge": "./bin/purge.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "argparse": "^1.0.9",
+    "async": "^2.1.2",
+    "aws-sdk": "^2.6.10",
+    "prompt": "^1.0.0"
+  }
+}
