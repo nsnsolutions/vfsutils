@@ -17,7 +17,7 @@ dynamoPurge --help
 
 ## Usage
 
-To dump all dat from a table, run dynamoPurge with the tablename to empty.
+To dump all data from a table, run dynamoPurge with the tablename to empty.
 
 ```bash
 dynamoPurge TABLENAME
