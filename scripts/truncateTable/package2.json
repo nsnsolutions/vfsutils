@@ -1,0 +1,16 @@
+{
+  "name": "cptable",
+  "version": "1.0.0",
+  "description": "Create a new table that matches the description of an existing table.",
+  "main": "truncateTable.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "argparse": "^1.0.9",
+    "async": "^2.1.2",
+    "aws-sdk": "^2.7.0"
+  }
+}

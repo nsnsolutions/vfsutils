@@ -1,27 +1,27 @@
 # Purge Table
 
-This script can be used to empty a dynamo table.
+This script can be used to delete and rebuild a dynamo table.
 
 ## Install
 
 - Clone this repository
-- Change to the dynamo-purge project directory
+- Change to the truncateTable project directory
 - Link the script into your bin path
 
 ```bash
 git clone git@github.com:nsnsolutions/vfsutils.git
-cd vfsutils/scripts/dynamo_purge
+cd vfsutils/scripts/truncateTable
 npm link
-dynamoPurge --help
+truncateTable --help
 ```
 
 ## Usage
 
-To dump all data from a table, run dynamoPurge with the tablename to empty.
+To dump all data from a table, run truncateTable with the tablename to empty.
 
 ```bash
-dynamoPurge TABLENAME
+truncateTable TABLENAME
 ```
 
-To see all options, run `dynamoPurge --help`
+To see all options, run `truncateTable --help`
 
