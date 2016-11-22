@@ -67,10 +67,8 @@ function main(opts) {
     var tasks = [
         loadTableDescription,
         createNewTableDescription,
-		deleteTable,
-        createNewTable
-		
-		
+        createNewTable,
+		deleteTable
 		
     ];
 
@@ -81,8 +79,9 @@ function main(opts) {
             process.exit(1);
         } else {
             console.log(data);
+			
         }
-
+		asdasdsa
     });
 
     function loadTableDescription(done) {
@@ -154,13 +153,14 @@ function main(opts) {
             if(err)
                 return done(err);
 
-            done(null,"Completed Successfully!");
+            done("Completed Successfully!");
         });
 		
-		//done();	
+		done();
     }
-	
-		function deleteTable(done) {
+}
+
+	function deleteTable(done) {
 		
 		//Used to delete a table
 		console.log("Deleting " + getOpts().SOURCE);
@@ -170,17 +170,14 @@ function main(opts) {
 		};
 		
 		ddb.deleteTable(params, (err, data) => {
-            if(err) return done(err);
+            //if(err) return done(err);
 			    
-			sleep.sleep(30);
-           done();
-			//getOpts().SOURCE + " deleted successfully!"
+			//else done();//console.log(data);
+			
+			//sleep.sleep(30);
+            //done();
         });
-		//done();
+		console.log(getOpts().SOURCE + " deleted successfully!")
 	}
-	
-}
-
-
 
 main(getOpts());
