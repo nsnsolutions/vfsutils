@@ -9,7 +9,8 @@ const sleep = require('sleep');
 
 const protectedTables = [
     'cb_analytics',
-    'vfscallbackmap'
+    'vfscallbackmap',
+    'VFS_'
 ];
 
 function getOpts() {
@@ -24,12 +25,11 @@ function getOpts() {
         type: String
     });
 
-	
+
     ap.addArgument([ 'TARGET' ], {
         help: 'The name of the table to create.',
         type: String
     });
-	
 
     ap.addArgument([ '--region' ], {
         help: 'Override the region to connect to.',
@@ -55,46 +55,38 @@ function getOpts() {
 function main(opts) {
     var ddb = new AWS.DynamoDB({ region: opts.region });
 
-	/*
-	//USED TO PROTECT PROD TABLES
-	var lcTable = opts.table.toLowerCase();
-    if(lcTable.startsWith('vfs_') || protectedTables.indexOf(lcTable) > -1) {
-        console.error("ERROR: That looks like a production table!\n -== I refuse to obey you! ==-");
-        process.exit(1);
-    }
-	*/
-	
     var tasks = [
         loadTableDescription,
         createNewTableDescription,
-		deleteTable,
+		    deleteTable,
         createNewTable
-		
-		
-		
     ];
 
     async.waterfall(tasks, (err, data) => {
-		
+
         if(err) {
             console.error(err);
             process.exit(1);
         } else {
             console.log(data);
         }
-
     });
 
     function loadTableDescription(done) {
         console.log("Loading table description: " + opts.SOURCE);
+
         ddb.describeTable({ TableName: opts.SOURCE }, (err, data) => {
-            if(!err)
-                opts.sourceDescription = data.Table;
-			//console.info(opts.sourceDescription);
-            done(err);
+            if(err) {
+              console.log("Couldn't load table description");
+              process.exit(1);
+            }else {
+              opts.sourceDescription = data.Table;
+              done(err);
+            }
+
         });
     }
-	
+
     function createNewTableDescription(done) {
         console.log("Creating new table description");
 
@@ -143,44 +135,42 @@ function main(opts) {
                 });
             }
         }
-	//console.log(opts.targetDescription);
+
         done();
     }
 
     function createNewTable(done) {
         console.log("Creating new table: " + opts.TARGET);
-		
-        ddb.createTable(opts.targetDescription, (err, data) => {
-            if(err)
-                return done(err);
 
+        ddb.createTable(opts.targetDescription, (err, data) => {
+            if(err) return done(err);
             done(null,"Completed Successfully!");
         });
-		
-		//done();	
     }
-	
+
 		function deleteTable(done) {
-		
-		//Used to delete a table
-		console.log("Deleting " + getOpts().SOURCE);
-		
-		var params = {
-			TableName: getOpts().SOURCE
-		};
-		
+      //USED TO PROTECT PROD TABLES
+      var lcTable =getOpts().SOURCE.toLowerCase();
+
+      if(lcTable.startsWith('vfs') || protectedTables.indexOf(lcTable) > -1) {
+        console.error("ERROR: " + lcTable + " looks like a production table!\n -== I refuse to obey you! ==-");
+        process.exit(1);
+      }
+
+  		console.log("Deleting " + getOpts().SOURCE);
+
+  		var params = {
+  			TableName: getOpts().SOURCE
+  		};
+
 		ddb.deleteTable(params, (err, data) => {
-            if(err) return done(err);
-			    
+      if(err) return done(err);
+
+      //NEED TO WAIT FOR DYNOMO TO FINISH DELETING - INCASE DELETE TABLE NAME AND CREATE TABLE NAME ARE THE SAME
 			sleep.sleep(30);
-           done();
-			//getOpts().SOURCE + " deleted successfully!"
+      done();
         });
-		//done();
 	}
-	
 }
-
-
 
 main(getOpts());
