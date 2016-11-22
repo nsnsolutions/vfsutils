@@ -68,6 +68,7 @@ function main(opts) {
         ddb.describeTable({ TableName: opts.SOURCE }, (err, data) => {
             if(!err)
                 opts.sourceDescription = data.Table;
+
             done(err);
         });
     }
@@ -106,18 +107,27 @@ function main(opts) {
         if('LocalSecondaryIndexes' in opts.sourceDescription) {
 
             opts.targetDescription.LocalSecondaryIndexes = [];
-
+            //console.log(opts.sourceDescription.LocalSecondaryIndexes);
             for(var i = 0; i < opts.sourceDescription.LocalSecondaryIndexes.length; i++) {
                 var lsi = opts.sourceDescription.LocalSecondaryIndexes[i];
                 opts.targetDescription.LocalSecondaryIndexes.push({
                     IndexName: lsi.IndexName,
                     KeySchema: lsi.KeySchema,
-                    Projection: lsi.Projection,
+                    Projection: lsi.Projection    //, MOVED TO HANDLE TABLES WITHOUT LocalSecondaryIndexes.ProvisionedThroughput
+                    /*ProvisionedThroughput: {
+                        ReadCapacityUnits: opts.read_capacity || lsi.ProvisionedThroughput.ReadCapacityUnits,
+                        WriteCapacityUnits: opts.write_capacity || lsi.ProvisionedThroughput.WriteCapacityUnits
+                    }*/
+                });
+                if('LocalSecondaryIndexes.ProvisionedThroughput' in opts.sourceDescription){
+                  opts.targetDescription.LocalSecondaryIndexes.push({
                     ProvisionedThroughput: {
                         ReadCapacityUnits: opts.read_capacity || lsi.ProvisionedThroughput.ReadCapacityUnits,
                         WriteCapacityUnits: opts.write_capacity || lsi.ProvisionedThroughput.WriteCapacityUnits
                     }
-                });
+                  });
+
+                }
             }
         }
 

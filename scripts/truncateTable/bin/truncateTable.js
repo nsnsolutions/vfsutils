@@ -127,12 +127,21 @@ function main(opts) {
                 opts.targetDescription.LocalSecondaryIndexes.push({
                     IndexName: lsi.IndexName,
                     KeySchema: lsi.KeySchema,
-                    Projection: lsi.Projection,
+                    Projection: lsi.Projection    //, MOVED TO HANDLE TABLES WITHOUT LocalSecondaryIndexes.ProvisionedThroughput
+                    /*ProvisionedThroughput: {
+                        ReadCapacityUnits: opts.read_capacity || lsi.ProvisionedThroughput.ReadCapacityUnits,
+                        WriteCapacityUnits: opts.write_capacity || lsi.ProvisionedThroughput.WriteCapacityUnits
+                    }*/
+                });
+                if('LocalSecondaryIndexes.ProvisionedThroughput' in opts.sourceDescription){
+                  opts.targetDescription.LocalSecondaryIndexes.push({
                     ProvisionedThroughput: {
                         ReadCapacityUnits: opts.read_capacity || lsi.ProvisionedThroughput.ReadCapacityUnits,
                         WriteCapacityUnits: opts.write_capacity || lsi.ProvisionedThroughput.WriteCapacityUnits
                     }
-                });
+                  });
+
+                }
             }
         }
 
