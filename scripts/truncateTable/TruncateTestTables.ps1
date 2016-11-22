@@ -17,11 +17,4 @@ foreach ($table in $myTableArry){
 
 truncateTable $table $table
 
-test-DDBemailJobItem-EGEM533V40E3 test-DDBemailJobItem-EGEM533V40E3_bkup
-
-
-
-
-aws dynamodb describe-table --table-name test-DDBemailJobItem-EGEM533V40E3
-test-DDBVFSUser-1N234NYBIBJG test-DDBVFSUser-1N234NYBIBJG_bkup
-test-DDBemailJobItem-EGEM533V40E3_bkup
+}
