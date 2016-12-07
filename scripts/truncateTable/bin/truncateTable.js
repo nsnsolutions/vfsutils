@@ -4,7 +4,14 @@
 const AWS = require('aws-sdk');
 const async = require('async');
 const ArgumentParser = require('argparse').ArgumentParser;
-const packageJSON = require('./package.json');
+const packageJSON = require('../package.json');
+const sleep = require('sleep');
+
+const protectedTables = [
+    'cb_analytics',
+    'vfscallbackmap',
+    'VFS_'
+];
 
 function getOpts() {
     var ap = new ArgumentParser({
@@ -14,9 +21,10 @@ function getOpts() {
     });
 
     ap.addArgument([ 'SOURCE' ], {
-        help: 'The name of the table to copy.',
+        help: 'The name of the table to delete.',
         type: String
     });
+
 
     ap.addArgument([ 'TARGET' ], {
         help: 'The name of the table to create.',
@@ -32,13 +40,13 @@ function getOpts() {
     ap.addArgument([ '--read-capacity' ], {
         help: 'Override the read capacity for all indexes on the new table.',
         type: Number,
-        defaultValue: null
+        defaultValue: 5
     });
 
     ap.addArgument([ '--write-capacity' ], {
         help: 'Override the write capacity for all indexes on the new table.',
         type: Number,
-        defaultValue: null
+        defaultValue: 5
     });
 
     return ap.parseArgs();
@@ -50,31 +58,37 @@ function main(opts) {
     var tasks = [
         loadTableDescription,
         createNewTableDescription,
+		    deleteTable,
         createNewTable
     ];
 
     async.waterfall(tasks, (err, data) => {
+
         if(err) {
             console.error(err);
             process.exit(1);
         } else {
-            console.info(data);
+            console.log(data);
         }
-
     });
 
     function loadTableDescription(done) {
-        console.info("Loading table description: " + opts.SOURCE);
-        ddb.describeTable({ TableName: opts.SOURCE }, (err, data) => {
-            if(!err)
-                opts.sourceDescription = data.Table;
+        console.log("Loading table description: " + opts.SOURCE);
 
-            done(err);
+        ddb.describeTable({ TableName: opts.SOURCE }, (err, data) => {
+            if(err) {
+              console.log("Couldn't load table description");
+              process.exit(1);
+            }else {
+              opts.sourceDescription = data.Table;
+              done(err);
+            }
+
         });
     }
 
     function createNewTableDescription(done) {
-        console.info("Creating new table description");
+        console.log("Creating new table description");
 
         opts.targetDescription = {
             TableName: opts.TARGET,
@@ -107,7 +121,7 @@ function main(opts) {
         if('LocalSecondaryIndexes' in opts.sourceDescription) {
 
             opts.targetDescription.LocalSecondaryIndexes = [];
-            //console.log(opts.sourceDescription.LocalSecondaryIndexes);
+
             for(var i = 0; i < opts.sourceDescription.LocalSecondaryIndexes.length; i++) {
                 var lsi = opts.sourceDescription.LocalSecondaryIndexes[i];
                 opts.targetDescription.LocalSecondaryIndexes.push({
@@ -135,15 +149,37 @@ function main(opts) {
     }
 
     function createNewTable(done) {
-        console.info("Creating new table: " + opts.TARGET);
+        console.log("Creating new table: " + opts.TARGET);
 
         ddb.createTable(opts.targetDescription, (err, data) => {
-            if(err)
-                return done(err);
-
-            done("Completed Successfully!");
+            if(err) return done(err);
+            done(null,"Completed Successfully!");
         });
     }
+
+		function deleteTable(done) {
+      //USED TO PROTECT PROD TABLES
+      var lcTable =getOpts().SOURCE.toLowerCase();
+
+      if(lcTable.startsWith('vfs') || protectedTables.indexOf(lcTable) > -1) {
+        console.error("ERROR: " + lcTable + " looks like a production table!\n -== I refuse to obey you! ==-");
+        process.exit(1);
+      }
+
+  		console.log("Deleting " + getOpts().SOURCE);
+
+  		var params = {
+  			TableName: getOpts().SOURCE
+  		};
+
+		ddb.deleteTable(params, (err, data) => {
+      if(err) return done(err);
+
+      //NEED TO WAIT FOR DYNOMO TO FINISH DELETING - INCASE DELETE TABLE NAME AND CREATE TABLE NAME ARE THE SAME
+			sleep.sleep(30);
+      done();
+        });
+	}
 }
 
 main(getOpts());
