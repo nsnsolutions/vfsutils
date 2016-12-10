@@ -31,8 +31,4 @@ Optional arguement default values
 --read-capacity 5
 --write-capacity 5
 
-## Install
 
-- Clone this repository
-- Change to the truncateTable project directory
-- Link the script into your bin path

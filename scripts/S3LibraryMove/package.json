@@ -1,0 +1,23 @@
+{
+  "name": "s3Move",
+  "version": "1.0.0",
+  "description": "Moves s3 items to another bucket",
+  "bin": {
+    "s3Move": "./bin/s3Move.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.1.2",
+    "argparse": "^1.0.9",
+    "sleep": "^5.0.0",
+    "request": "^2.78.0",
+    "aws-sdk": "^2.6.10"
+  },
+  "devDependencies": {
+    "sleep": "^5.0.0"
+  }
+}

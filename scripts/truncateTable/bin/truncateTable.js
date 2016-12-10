@@ -58,7 +58,7 @@ function main(opts) {
     var tasks = [
         loadTableDescription,
         createNewTableDescription,
-		    deleteTable,
+		deleteTable,
         createNewTable
     ];
 
