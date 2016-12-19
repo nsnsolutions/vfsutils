@@ -1,23 +1,21 @@
 {
-  "name": "s3Move",
+  "name": "products",
   "version": "1.0.0",
-  "description": "Moves s3 items to another bucket",
-  "bin": {
-    "s3Move": "./bin/s3Move.js"
-  },
+  "description": "",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "async": "^2.1.2",
-    "argparse": "^1.0.9",
-    "sleep": "^5.0.0",
-    "request": "^2.78.0",
-    "aws-sdk": "^2.6.10"
+  "config": {
+    "region": "us-west-2",
+    "productTable": "IL_VFS_Product",
+    "rpc": "devel.rpc.velma.com"
   },
-  "devDependencies": {
-    "sleep": "^5.0.0"
+  "dependencies": {
+    "async": "^2.1.4",
+    "aws-sdk": "^2.7.15",
+    "node-rest-client": "^2.0.1"
   }
 }
