@@ -10,8 +10,8 @@
   "license": "ISC",
   "config": {
     "region": "us-west-2",
-    "productTable": "IL_VFS_Product",
-    "rpc": "devel.rpc.velma.com"
+    "productTable": "TEST_VFS_Product",
+    "rpc": "test.rpc.velma.com"
   },
   "dependencies": {
     "async": "^2.1.4",

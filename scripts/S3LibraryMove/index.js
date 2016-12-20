@@ -1,5 +1,6 @@
 'use strict';
 
+var fs = require('fs');
 const Client = require('node-rest-client').Client;
 const aws = require('aws-sdk');
 const async = require('async');
@@ -14,6 +15,7 @@ const tasks = [
     loadProducts,
     transformProducts,
     deleteAsset,
+    wait,
     createAsset,
     buildDeletes,
     buildUpdates,
@@ -25,6 +27,11 @@ var state = {
     lookup: {},
     updateParams: []
 };
+
+function wait(done) {
+    console.log("Waiting for 5 seconds...");
+    setTimeout(done, 5000);
+}
 
 async.waterfall(tasks, (err, data) => {
 
@@ -62,7 +69,7 @@ function transformProducts(done) {
 
 function deleteAsset(done) {
     console.log("Removing any existing asset refrences. Failures are silenced and ignored.");
-    async.each(state.products, (item, next) => {
+    async.eachSeries(state.products, (item, next) => {
         var params = {
             headers: {
                 'X-Repr-Format': 'RPC',
@@ -74,13 +81,15 @@ function deleteAsset(done) {
             }
         };
 
-        client.post(rpcDeleteAsset, params, (data, resp) => next());
+        client.post(rpcDeleteAsset, params, (data, resp) => {
+            setTimeout(next, 500);
+        });
     }, done);
 }
 
 function createAsset(done) {
     console.log("Inserting template assets for each product...");
-    async.each(state.products, (item, next) => {
+    async.eachSeries(state.products, (item, next) => {
         var params = {
             headers: {
                 'X-Repr-Format': 'RPC',
@@ -99,7 +108,7 @@ function createAsset(done) {
             if(data.hasError === false) {
                 console.log("Asset created for product: " + item.id);
                 item.template = data.result.link + "?versionId=" + data.result.versionId;
-                next();
+                setTimeout(next(), 1000);
             } else {
                 next({
                     name: "Error",
@@ -127,9 +136,27 @@ function buildUpdates(done) {
     }, done);
 }
 
+
 function commit(done) {
-    console.log("Commiting changes...");
-    var params = { RequestItems: {} };
-    params.RequestItems[config.productTable] = state.updateParams;
-    ddbClient.batchWrite(params, done);
+
+    fs.writeFile('./log.json', JSON.stringify(state.updateParams, null, 4));
+
+    var params = { RequestItems: {} },
+        i, j, chunk = 25;
+
+    console.log("Commiting changes in 25 item batches...");
+
+    for(i = 0, j=state.updateParams.length; i<j; i+=chunk) {
+
+        params.RequestItems[config.productTable] = state.updateParams.slice(i,i+chunk);
+
+        ddbClient.batchWrite(params, (e, d) => {
+            if(e)
+                return console.error(e);
+            console.log(d);
+        });
+    }
+
+
+
 }
