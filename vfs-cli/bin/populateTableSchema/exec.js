@@ -3,36 +3,49 @@
 const Redis = require('redis');
 const AWS = require('aws-sdk');
 const fs = require('fs');
+const async = require('async');
 
 module.exports = function populateTableSchema(opts, console, done) {
 
-    var table = opts.TABLE,
+    var tables = opts.TABLE,
         redis = Redis.createClient({ url: opts.redis_uri }),
-        ddbClient = new AWS.DynamoDB({ region: opts.region }),
-        params = { TableName: table },
-        cacheKey = computeTableKey(table);
+        ddbClient = new AWS.DynamoDB({ region: opts.region });
 
-    console.info(`Reading data from ${table}`);
+    async.each(tables, (table, next) => {
+        var params = { TableName: table },
+            cacheKey = computeTableKey(table);
 
-    ddbClient.describeTable(params, (err, data) => {
+        console.info(`Reading data from ${table}`);
 
-        if(err)
-            return done(err);
+        ddbClient.describeTable(params, (err, data) => {
 
-        console.debug("Recieved data:\n", data.Table);
+            if(err)
+                return next(err);
 
-        let _data;
+            console.debug("Recieved data:\n", data.Table);
 
-        try { _data = JSON.stringify(data.Table); }
-        catch(e) { return done(e); }
+            let _data;
 
-        console.info("SET: " + cacheKey);
+            try { _data = JSON.stringify(data.Table); }
+            catch(e) { return next(e); }
 
-        redis.set(cacheKey, _data, done);
+            console.info("SET: " + cacheKey);
+
+            redis.set(cacheKey, _data, next);
+        });
+
+    }, (e) => {
+        redis.quit();
+        done(e)
     });
 }
 
 function computeTableKey(table) {
-    return `TABLE:${table}`
+
+    /*
+     * DynamoDB:TableDescription:Table=VFS_Jobs
+     */
+
+    return `DynamoDB:TableDescription:Table=${table}`
 }
 
