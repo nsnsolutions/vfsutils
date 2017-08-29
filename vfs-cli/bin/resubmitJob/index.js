@@ -23,6 +23,15 @@ module.exports = {
         );
 
         ap.addArgument(
+            [ '--force' ],
+            {
+                help: "Ignore job status check and force resubmit.",
+                action: 'storeTrue',
+                defaultValue: false
+            }
+        );
+
+        ap.addArgument(
             [ '-r','--region' ],
             {
                 help: "The AWS Region used to connect.",
