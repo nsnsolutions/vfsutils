@@ -1,0 +1,19 @@
+{
+  "name": "getDynamoJob",
+  "version": "1.0.0",
+  "description": "Retrieves all nodes from dynamo for a given job.",
+  "bin": {
+    "dynamoPurge": "./bin/getjob.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "argparse": "^1.0.9",
+    "async": "^2.1.2",
+    "aws-sdk": "^2.6.10",
+    "prompt": "^1.0.0"
+  }
+}
