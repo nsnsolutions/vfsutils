@@ -1,6 +1,7 @@
 'use strict';
 
 const UrlParser = require('url')
+const fs = require('fs');
 
 module.exports = readText;
 
